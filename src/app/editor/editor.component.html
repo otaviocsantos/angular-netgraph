@@ -1,0 +1,22 @@
+<ul>
+  <li><button (click)="connect(selected, getNodeById(connections.value))" [disabled]="selected == null">connect to</button>
+    <select #connections [disabled]="selected == null">
+      <option *ngFor="let o of possibleConnections" value="{{o.id}}">{{o.label}}</option>
+    </select>
+  </li>
+  <li><button (click)="disconnect(selected, getNodeById(disconnections.value))" [disabled]="selected == null">disconnect from</button>
+    <select #disconnections [disabled]="selected == null">
+      <option *ngFor="let o of possibleDisconnections" value="{{o.id}}">{{o.label}}</option>
+    </select>
+  </li>
+  <li><button (click)="remove()" [disabled]="selected == null">remove Node</button></li>
+</ul>
+<div>
+  <button (click)="zoomIn()">+</button>
+  <button (click)="zoomOut()">-</button>
+</div>
+<h3 *ngIf="selected">{{selected.label}}</h3>
+<ul>
+  <li *ngFor="let e of names">{{e}}</li>
+</ul>
+<app-netgraph #net [value]="data" (select)="select($event)" ></app-netgraph>
