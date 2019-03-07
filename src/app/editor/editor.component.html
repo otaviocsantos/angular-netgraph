@@ -16,8 +16,8 @@
   <button (click)="zoomOut()">-</button>
 </div>
 <h3 *ngIf="selected">{{selected.label}}</h3>
-<ul>
-  <li *ngFor="let e of names">{{e}}</li>
+<ul id="box">
+  <li *ngFor="let e of names" class="item">{{e}}</li>
 </ul>
 <div style="overflow:hidden">
 <app-netgraph #net [value]="data" (select)="select($event)" ></app-netgraph>

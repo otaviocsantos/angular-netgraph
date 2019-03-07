@@ -1,3 +1,6 @@
-<p>
-  netgraph works!
-</p>
+<div id="groups">
+  <ul>
+    <li *ngFor="let item of labels; let i = index" (click)="toggle(item)" class="group-label" [ngClass]="{'hidden-label':  hidden.indexOf(item) > -1 }">{{item}}</li>
+  </ul>
+</div>
+
