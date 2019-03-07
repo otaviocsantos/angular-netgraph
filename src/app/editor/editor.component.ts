@@ -80,10 +80,10 @@ export class EditorComponent implements OnInit {
 
 
   zoomIn() {
-    this.net.zoom(5);
+    this.net.zoom(2);
   }
   zoomOut() {
-    this.net.zoom(-5);
+    this.net.zoom(.5);
   }
 
   getNodeById(id) {

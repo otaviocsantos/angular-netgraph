@@ -19,4 +19,6 @@
 <ul>
   <li *ngFor="let e of names">{{e}}</li>
 </ul>
+<div style="overflow:hidden">
 <app-netgraph #net [value]="data" (select)="select($event)" ></app-netgraph>
+</div>

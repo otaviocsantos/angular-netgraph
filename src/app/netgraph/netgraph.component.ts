@@ -12,6 +12,8 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
   svg;
   simulation;
+  zoomFunc;
+  container;
 
   links: any[];
   nodes: any[];
@@ -76,8 +78,9 @@ export class NetgraphComponent implements OnInit, OnChanges {
     }
   }
 
-  constructor(private container: ElementRef) {
+  constructor(private ground: ElementRef) {
     this.scale = d3.scaleOrdinal(d3.schemeCategory10);
+
   }
 
   ngOnInit() {
@@ -104,12 +107,34 @@ export class NetgraphComponent implements OnInit, OnChanges {
   }
 
   restart() {
-    d3.select(this.container.nativeElement).select('svg').remove();
+
+    // const zoom = d3.zoom()
+    //   .scaleExtent([1, 10])
+    //   .on('zoom', () => this.zoomed());
+
+    d3.select(this.ground.nativeElement).select('svg').remove();
 
     const vbAttr = `${-this.width / 2} ${-this.height / 2} ${this.width} ${this.height}`;
 
-    this.svg = d3.select(this.container.nativeElement).append('svg').attr('width', this.width).attr('height', this.height)
+
+    this.svg = d3.select(this.ground.nativeElement).append('svg').attr('width', this.width).attr('height', this.height)
       .attr('viewBox', vbAttr);
+    // .call(this.zoomFunc);
+    // .call(d3.zoom().scaleExtent([1 / 2, 8]).on('zoom', () => this.zoomed()))
+
+
+    this.container = this.svg.append('g');
+
+    this.zoomFunc = d3.zoom()
+      .scaleExtent([1 / 2, 10])
+      .on('zoom', () => {
+        this.container.attr('transform', d3.event.transform);
+      });
+    this.svg.call(this.zoomFunc);
+
+
+
+    // this.applyZoomableBehaviour(this.svg, this.container.nativeElement);
 
 
     this.createSimulation(this.nodes, this.links);
@@ -127,8 +152,31 @@ export class NetgraphComponent implements OnInit, OnChanges {
     this.update();
   }
 
+  // svg, nativeElement
+
+  // applyZoomableBehaviour(svg, container) {
+  // applyZoomableBehaviour(svgElement, containerElement) {
+  //   console.log('svgElement',svgElement);
+  // console.log('containerElement',containerElement);
+  //   // applyZoomableBehaviour(svg, containerElement) {
+  // // let svg, container, zoomed, zoom;
+  // let zoomed, zoom;
+
+  // let svg = d3.select(svgElement);
+  // let container = d3.select(containerElement);
+
+  // zoomed = () => {
+  //   const transform = d3.event.transform;
+  //   container.attr('transform', 'translate(' + transform.x + ',' + transform.y + ') scale(' + transform.k + ')');
+  // };
+
+  // zoom = d3.zoom().on('zoom', zoomed);
+  // svg.call(zoom);
+  // }
+
+
   createLinks() {
-    const l = this.svg
+    const l = this.container
       .append('g');
 
     this.linkElements = l
@@ -147,7 +195,7 @@ export class NetgraphComponent implements OnInit, OnChanges {
   }
 
   createNodes() {
-    const n = this.svg
+    const n = this.container
       .append('g');
 
     this.nodeElements = n
@@ -187,7 +235,7 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
 
   createNodeLabels() {
-    this.nodeLabelElements = this.svg.append('g')
+    this.nodeLabelElements = this.container.append('g')
       .selectAll(this.nodeLabelClass)
       .data(this.nodes.filter(element => {
 
@@ -333,13 +381,16 @@ export class NetgraphComponent implements OnInit, OnChanges {
     }
   }
 
-  zoomed() {
-    this.simulation = d3.event.transform;
-    // this.render();
+  zoom(value) {
+    this.zoomFunc.scaleBy(this.svg, value);
   }
 
-  zoom(value: number = 2) {
 
-  }
+  // zoomed() {
+  //   this.svg.attr('transform', 'translate(' +
+  //     d3.event.transform.x + ',' + d3.event.transform.y +
+  //     ')scale(' + d3.event.transform.k + ')');
+  // }
+
 
 }
