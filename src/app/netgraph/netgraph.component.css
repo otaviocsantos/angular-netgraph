@@ -39,3 +39,24 @@
 .hidden-label{
   text-decoration: line-through;
 }
+
+#graph{
+  background: white;
+}
+
+.ngraph-node-label{
+  font-family : 'sans-serif';
+  font-size : 12px;
+  fill : black;
+  cursor: pointer;
+}
+
+.ngraph-link{
+  stroke: grey;
+}
+
+.ngraph-node{
+  stroke: white;
+  fill-opacity: 0.3;
+  stroke-width: 0;
+}

@@ -1,10 +1,10 @@
 <ul>
-  <li><button (click)="connect(selected, getNodeById(connections.value))" [disabled]="selected == null">connect to</button>
+  <li><button (click)="connect(selected, getNodeById(connections.value))" [disabled]="selected == null || possibleConnections.length ===0">connect to</button>
     <select #connections [disabled]="selected == null">
       <option *ngFor="let o of possibleConnections" value="{{o.id}}">{{o.label}}</option>
     </select>
   </li>
-  <li><button (click)="disconnect(selected, getNodeById(disconnections.value))" [disabled]="selected == null">disconnect from</button>
+  <li><button (click)="disconnect(selected, getNodeById(disconnections.value))" [disabled]="selected == null || possibleDisconnections.length ===0">disconnect from</button>
     <select #disconnections [disabled]="selected == null">
       <option *ngFor="let o of possibleDisconnections" value="{{o.id}}">{{o.label}}</option>
     </select>

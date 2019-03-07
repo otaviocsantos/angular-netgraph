@@ -58,7 +58,8 @@ export class EditorComponent implements OnInit {
     this.nodes = this.names.map(o => {
       return {
         id: this.uidService.get(),
-        label: o
+        label: o,
+        type: Math.random() > 0.6666 ? 'friend' : Math.random() > 0.3333 ? 'family' : 'work'
       };
     });
 
@@ -68,16 +69,15 @@ export class EditorComponent implements OnInit {
       this.links.push({
         source: this.nodes[0],
         target: this.nodes[i],
-        group: Math.random() > 0.5 ? 'friends' : 'family'
       });
     }
     this.updateData();
 
   }
+
   select(event) {
     this.selected = event;
   }
-
 
   zoomIn() {
     this.net.zoom(2);
@@ -93,8 +93,7 @@ export class EditorComponent implements OnInit {
   connect(source, target) {
     this.links.push({
       source,
-      target,
-      group: Math.random() > 0.5 ? 'friends' : 'family'
+      target
     });
     this.updateData();
   }

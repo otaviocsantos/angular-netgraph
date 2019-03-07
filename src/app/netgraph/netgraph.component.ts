@@ -1,8 +1,9 @@
-import { Component, OnInit, ElementRef, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, OnInit, ElementRef, Input, Output, EventEmitter, ViewEncapsulation, OnChanges } from '@angular/core';
 import * as d3 from 'd3';
 
 @Component({
   selector: 'app-netgraph',
+  encapsulation: ViewEncapsulation.None,
   templateUrl: './netgraph.component.html',
   styleUrls: ['./netgraph.component.css']
 })
@@ -17,7 +18,6 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
   links: any[];
   nodes: any[];
-  labels: any[];
   hidden: any[];
 
   groups;
@@ -35,13 +35,9 @@ export class NetgraphComponent implements OnInit, OnChanges {
   linkClass = 'ngraph-link';
   nodeLabelClass = 'ngraph-node-label';
 
-  linkStroke = 'black';
-  linkOpacity = 1;
-  linkWidth = 1;
 
-  fontFamily = 'sans-serif';
-  fontSize = '10px';
-  fontFill = 'black';
+
+  
 
   mEnabled = true;
   @Input('enabled') set enabled(value: boolean) {
@@ -95,9 +91,7 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
     this.nodes = nodes;
 
-    this.labels = [...Array.from(new Set(links.map(item => item.group)))];
-
-    this.groups = [...Array.from(new Set(links.map(item => item.group)))];
+    this.groups = [...Array.from(new Set(nodes.map(item => item.type)))];
 
     this.hidden = [];
 
@@ -110,10 +104,9 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
     const vbAttr = `${-this.width / 2} ${-this.height / 2} ${this.width} ${this.height}`;
 
-
     this.svg = d3.select(this.ground.nativeElement).append('svg').attr('width', this.width).attr('height', this.height)
+      .attr('id', 'graph')
       .attr('viewBox', vbAttr);
-
 
     this.container = this.svg.append('g');
 
@@ -145,15 +138,12 @@ export class NetgraphComponent implements OnInit, OnChanges {
     this.linkElements = l
       .selectAll('line')
       .data(this.links.filter(element => {
-        if (this.hidden.indexOf(element.group) === -1) {
+        if (this.hidden.indexOf(element.target.type) === -1 && this.hidden.indexOf(element.source.type) === -1) {
           return element;
         }
       }))
       .enter().append('line')
-      .attr('stroke', this.linkStroke)
       .attr('class', this.linkClass)
-      .attr('stroke-opacity', this.linkOpacity)
-      .attr('stroke-width', this.linkWidth)
       ;
   }
 
@@ -162,14 +152,13 @@ export class NetgraphComponent implements OnInit, OnChanges {
       .append('g');
 
     this.nodeElements = n
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 1.5)
+     
+      .attr('class', this.nodeClass)
+
       .selectAll('circle')
       .data(this.nodes.filter(element => {
 
-        const link = this.getLink(this.nodes[0].id, element.id);
-
-        if (link === undefined || this.hidden.indexOf(link.group) === -1) {
+        if (this.hidden.indexOf(element.type) === -1) {
           return element;
         }
 
@@ -183,8 +172,7 @@ export class NetgraphComponent implements OnInit, OnChanges {
       .attr('width', this.nodeRadius * 2)
       .attr('height', this.nodeRadius * 2)
       .attr('fill', d => this.color(d))
-      .style('fill-opacity', 0.3)
-      .style('stroke-width', 0)
+      
       .on('click', (o, i, l) => { this.clicked(o, i, l); })
       .call(d3.drag()
         // .on('touch', (o) => { this.clicked(o); })
@@ -197,24 +185,18 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
 
   createNodeLabels() {
+    
     this.nodeLabelElements = this.container.append('g')
       .selectAll(this.nodeLabelClass)
       .data(this.nodes.filter(element => {
 
-        const link = this.getLink(this.nodes[0].id, element.id);
-
-        if (link === undefined || this.hidden.indexOf(link.group) === -1) {
+        if (this.hidden.indexOf(element.type) === -1) {
           return element;
         }
 
       }))
       .enter().append('text')
-      .attr('font-size', this.fontSize)
-      .attr('font-family', this.fontFamily)
-      .style('cursor', 'default')
       .attr('class', this.nodeLabelClass)
-      .style('cursor', 'pointer')
-      .attr('fill', this.fontFill)
       .text(d => d.label)
       .on('click', (o, i, l) => { this.clicked(o, i, l); })
       .call(d3.drag()
@@ -262,9 +244,8 @@ export class NetgraphComponent implements OnInit, OnChanges {
   }
 
   color(d) {
-    const link = this.getLink(this.nodes[0].id, d.id);
-    if (link !== undefined) {
-      return this.scale(link.group);
+    if (d.type) {
+      return this.scale(d.type);
     }
     return 'white';
   }
