@@ -11,35 +11,40 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
   @Output() select = new EventEmitter<any>();
 
-  svg;
-  simulation;
-  zoomFunc;
-  container;
+  private svg;
+  private simulation;
+  private zoomFunc;
+  private container;
 
-  links: any[];
-  nodes: any[];
-  hidden: any[];
+  private links: any[];
+  private nodes: any[];
+  private hidden: any[];
 
-  groups;
-  scale;
+  private groups;
+  private scale;
 
-  nodeRadius = 5;
-  repulsionForce = -850;
+  private mNodeRadius = 5;
+  @Input('nodeRadius') set nodeRadius(value: number) {
+    this.nodeRadius = value;
+  }
+  get nodeRadius(): number {
+    return this.nodeRadius;
+  }
 
-  nodeElements;
-  linkElements;
-  nodeLabelElements;
+  private mRepulsionForce = -850;
+  @Input('repulsionForce') set repulsionForce(value: number) {
+    this.mRepulsionForce = value;
+  }
+  get respulsioForce(): number {
+    return this.mRepulsionForce;
+  }
+
+  private nodeElements;
+  private linkElements;
+  private nodeLabelElements;
 
 
-  nodeClass = 'ngraph-node';
-  linkClass = 'ngraph-link';
-  nodeLabelClass = 'ngraph-node-label';
-
-
-
-  
-
-  mEnabled = true;
+  private mEnabled = true;
   @Input('enabled') set enabled(value: boolean) {
     this.mEnabled = value;
     if (this.svg) {
@@ -74,7 +79,6 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
   constructor(private ground: ElementRef) {
     this.scale = d3.scaleOrdinal(d3.schemeCategory10);
-
   }
 
   ngOnInit() {
@@ -143,7 +147,7 @@ export class NetgraphComponent implements OnInit, OnChanges {
         }
       }))
       .enter().append('line')
-      .attr('class', this.linkClass)
+      .attr('class', 'ngraph-link')
       ;
   }
 
@@ -152,9 +156,7 @@ export class NetgraphComponent implements OnInit, OnChanges {
       .append('g');
 
     this.nodeElements = n
-     
-      .attr('class', this.nodeClass)
-
+      .attr('class', 'ngraph-node')
       .selectAll('circle')
       .data(this.nodes.filter(element => {
 
@@ -168,11 +170,11 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
         return document.createElementNS('http://www.w3.org/2000/svg', shape);
       })
-      .attr('r', this.nodeRadius)
-      .attr('width', this.nodeRadius * 2)
-      .attr('height', this.nodeRadius * 2)
+      .attr('r', this.mNodeRadius)
+      .attr('width', this.mNodeRadius * 2)
+      .attr('height', this.mNodeRadius * 2)
       .attr('fill', d => this.color(d))
-      
+
       .on('click', (o, i, l) => { this.clicked(o, i, l); })
       .call(d3.drag()
         // .on('touch', (o) => { this.clicked(o); })
@@ -185,9 +187,9 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
 
   createNodeLabels() {
-    
+
     this.nodeLabelElements = this.container.append('g')
-      .selectAll(this.nodeLabelClass)
+      .selectAll('ngraph-node-label')
       .data(this.nodes.filter(element => {
 
         if (this.hidden.indexOf(element.type) === -1) {
@@ -196,7 +198,7 @@ export class NetgraphComponent implements OnInit, OnChanges {
 
       }))
       .enter().append('text')
-      .attr('class', this.nodeLabelClass)
+      .attr('class', 'ngraph-node-label')
       .text(d => d.label)
       .on('click', (o, i, l) => { this.clicked(o, i, l); })
       .call(d3.drag()
@@ -211,7 +213,7 @@ export class NetgraphComponent implements OnInit, OnChanges {
   createSimulation(nodes, links) {
     this.simulation = d3.forceSimulation(nodes)
       .force('link', d3.forceLink(links).id((d: any) => d.id))
-      .force('charge', d3.forceManyBody().strength(this.repulsionForce))
+      .force('charge', d3.forceManyBody().strength(this.mRepulsionForce))
       .force('x', d3.forceX())
       .force('y', d3.forceY());
   }
@@ -227,8 +229,8 @@ export class NetgraphComponent implements OnInit, OnChanges {
       this.nodeElements
         .attr('cx', d => d.x) // cx, cy for circle elements
         .attr('cy', d => d.y)
-        .attr('x', d => d.x - this.nodeRadius) // x,y for rect elements
-        .attr('y', d => d.y - this.nodeRadius)
+        .attr('x', d => d.x - this.mNodeRadius) // x,y for rect elements
+        .attr('y', d => d.y - this.mNodeRadius)
         ;
 
       this.nodeLabelElements
